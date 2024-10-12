@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Tracker</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Task Tracker</h1>
+        <form id="task-form" class="mt-3">
+            <div class="form-group">
+                <input type="text" id="title" class="form-control" placeholder="Task Title" required>
+            </div>
+            <div class="form-group">
+                <textarea id="description" class="form-control" placeholder="Task Description"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Task</button>
+        </form>
+        <ul id="tasks" class="list-group mt-4"></ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/tasks')
+                .then(response => response.json())
+                .then(data => {
+                    const tasksList = document.getElementById('tasks');
+                    data.forEach(task => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item';
+                        li.textContent = task.title;
+                        tasksList.appendChild(li);
+                    });
+                });
+
+            const form = document.getElementById('task-form');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const title = document.getElementById('title').value;
+                const description = document.getElementById('description').value;
+
+                fetch('/tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, description })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    location.reload();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
